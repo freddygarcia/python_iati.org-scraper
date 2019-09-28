@@ -1,6 +1,8 @@
 import sys
 import collections
 import readline
+import re
+import datetime
 
 import click
 
@@ -50,6 +52,33 @@ class Menu():
                         )
         justified = clean_chars.ljust(30)
         return justified
+
+    @staticmethod
+    def validate_date(entry):
+        pattern = r'^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$'
+        match = re.match(pattern, entry)
+        is_valid = None
+
+        if match is not None:
+            curr_date = datetime.date.today()
+            group_matches = match.groupdict()
+            str_date = '{year}-{month}-{day}'.format(**group_matches)
+
+            try:
+                entry_date = datetime.datetime \
+                                     .strptime(str_date, '%Y-%m-%d') \
+                                     .date()
+
+                MIN_DATE = datetime.date(1960, 1, 1)
+                MAX_DATE = curr_date
+
+                if entry_date >= MIN_DATE and entry_date <= MAX_DATE:
+                    is_valid = entry
+
+            except Exception as e:
+                pass
+
+        return is_valid
 
     def __init__(self):
         self.reset_selected_filters()
@@ -109,12 +138,14 @@ class Menu():
 
         # read input choice
         choice = input(f"({menu_choice}) > ")
+
         if menu_choice not in activities_filter.no_autocomplete:
             # pick a filter by given choice
             result = Menu.pick(selected_filter, choice)
         else:
-            # keep same value
-            result = choice
+            # keep same value when the field has not autocompletion feature
+            result = Menu.validate_date(choice)
+
         # check if result has some value
         valid_choice = result is not None
 

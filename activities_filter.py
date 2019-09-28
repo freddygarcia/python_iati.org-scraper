@@ -1,4 +1,10 @@
-import datetime
+'''
+    Filters used in the script.
+
+    If want to add a new filter, append a new entry to the `filters` dict.
+
+    The filter must be defined here http://reference.iatistandard.org/203/guidance/datastore/reference/data-api/
+'''
 
 filters = {
     'sector': {
